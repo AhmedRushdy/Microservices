@@ -14,7 +14,7 @@ variables:
   BUILD_CONTEXT: '.'
 
 stages:
-- template: .pipelines/templates/stage-build-and-push.yml
+- template: .pipeline/templates/stage-build-and-push.yml
   parameters:
     dockerServiceConnection: $(DOCKER_SC)
     acrName: $(ACR_NAME)
