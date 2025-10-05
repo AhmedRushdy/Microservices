@@ -38,7 +38,7 @@ stages:
 
         echo "ACR docker login…"
         echo ${{ parameters.registryName }}
-        az acr login -n ${{ parameters.registryName }}
+        az acr login -n 'acrtaskpwc.azurecr.io'
         
     - task: Docker@2
       displayName: Build & Push (immutable + env tag)
