@@ -1,6 +1,8 @@
 # CI: Build & push Docker image to ACR via service connection
 trigger:
      - main
+
+pr: none
 pool:
   name: pwc-task  
 
