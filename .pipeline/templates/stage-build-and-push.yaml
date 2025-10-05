@@ -31,9 +31,7 @@ stages:
         dockerfile: '${{ parameters.dockerfilePath }}'
         buildContext: '${{ parameters.buildContext }}'
         # containerRegistry: '${{ parameters.dockerServiceConnection }}'
-        tags: |
-          $(Build.BuildId)
-          latest
+        tags: latest
 
     # - bash: |
     #     mkdir -p out
