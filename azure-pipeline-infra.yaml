@@ -37,7 +37,7 @@ stages:
   dependsOn: terraform_validate_plan
   condition: succeeded()
   jobs:
-    steps:
+
       - checkout: self
         displayName: 'Checkout Repository'
 
