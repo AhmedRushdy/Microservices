@@ -5,7 +5,7 @@ pool:
 
 variables:
   - name: AZURE_RM_SVC_CONN
-    value: 'sc-azure-terraform'
+    value: 'sc-aks-terraform'
   - name: TF_STATE_RG
     value: 'pwc-task'
   - name: TF_STATE_SA
