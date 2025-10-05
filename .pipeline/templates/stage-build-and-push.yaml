@@ -5,9 +5,6 @@ parameters:
   dockerfilePath: ''            # required
   buildContext: '.'             # optional
 
-steps:
-
-
 stages:
 - stage: BuildAndPush
   displayName: Build & Push Image
@@ -21,8 +18,8 @@ stages:
     - template: steps-resolve-envtag.yaml
 
     - task: Docker@2
-    displayName: Login to ACR
-    inputs:
+      displayName: Login to ACR
+      inputs:
         command: 'login'
         containerRegistry: '${{ parameters.dockerServiceConnection }}'      parameters:
 
