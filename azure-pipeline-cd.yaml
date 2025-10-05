@@ -3,7 +3,6 @@ resources:
   pipelines:
     - pipeline: ci
       source: ci
-      resources:
       trigger: 
         branches:
           include: 
