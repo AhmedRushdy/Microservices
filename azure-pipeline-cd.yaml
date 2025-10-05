@@ -7,7 +7,7 @@ resources:
         branches:
           include: 
           - main
-
+trigger: none
 pool:
   name: pwc-task
 
