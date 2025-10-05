@@ -21,7 +21,7 @@ variables:
   K8S_CONTAINER_NAME: 'flask-app'
 
 stages:
-- stage: Deploy_Dev
+- stage: Deploy
   displayName: Deploy
   jobs:
   - template: .pipeline/templates/job-deploy-k8s.yaml
@@ -33,5 +33,5 @@ stages:
       namespace: '$(NS)'
       manifestPath: $(K8S_MANIFEST_PATH)
       imageRepository: '$(ACR_NAME).azurecr.io/$(IMAGE_NAME)'
-      imageTag: $(resources.pipeline.ci.runID)     # ← uses CI run ID (e.g., 26)
+      imageTag: $(resources.pipeline.ci.runID)     
       containerName: $(K8S_CONTAINER_NAME)
