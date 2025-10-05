@@ -3,7 +3,11 @@ resources:
   pipelines:
     - pipeline: ci
       source: ci
-      trigger: true
+      resources:
+      trigger: 
+        branches:
+          include: 
+          - main
 
 pool:
   name: pwc-task
@@ -21,7 +25,7 @@ stages:
 - stage: Deploy_Dev
   displayName: Deploy
   jobs:
-  - template: .pipelines/templates/job-deploy-k8s.yml
+  - template: .pipelines/templates/job-deploy-k8s.yaml
     parameters:
       deploymentJobName: "dev"
       displayName: "Deploy to default Environment"
