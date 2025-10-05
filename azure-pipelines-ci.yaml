@@ -2,8 +2,6 @@
 trigger:
      - main
 
-pool:
-  vmImage: 'ubuntu-latest'
 
 # Fallback defaults 
 variables:
