@@ -24,9 +24,9 @@ stages:
         az login --identity 1>/dev/null
 
         echo "ACR docker login…"
-        # Approach 1: direct docker login via ACR (needs docker daemon)
-        # This will perform a 'docker login' for you if Docker is available
+        echo ${{ parameters.registeryName }}
         az acr login -n ${{ parameters.registeryName }}
+        
     - task: Docker@2
       displayName: Build & Push (immutable + env tag)
       inputs:
