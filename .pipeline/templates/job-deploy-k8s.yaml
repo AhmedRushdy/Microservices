@@ -22,13 +22,11 @@ parameters:
     default: 'k8s'
   - name: imageRepository
     type: string
-    default: ''            # e.g. acrname.azurecr.io/user-product-svc
   - name: imageTag
     type: string
     default: 'latest'
   - name: containerName
     type: string
-    default: ''            # must match containers[].name in Deployment
 
 jobs:
 - deployment: ${{ parameters.deploymentJobName }}
