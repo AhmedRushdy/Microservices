@@ -32,7 +32,7 @@ stages:
         buildContext: '${{ parameters.buildContext }}'
         # containerRegistry: '${{ parameters.dockerServiceConnection }}'
         tags: |
-          $(Build.SourceBranchName)-$(Build.BuildId)
+          $(Build.BuildId)
           $(envTag)
 
     # - bash: |
