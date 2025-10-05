@@ -37,6 +37,13 @@ jobs:
         steps:
         - checkout: self
 
+        - bash: |
+            echo "Updating image tag to: ${{ parameters.imageTag }}"
+            sed -i "s|image: ${{ parameters.imageRepository }}:.*|image: ${{ parameters.imageRepository }}:${{ parameters.imageTag }}|g" ${{ parameters.manifestPath }}/deployment.yaml
+            echo "Updated deployment.yaml:"
+            cat ${{ parameters.manifestPath }}/deployment.yaml | grep "image:"
+          displayName: 'Update Image Tag in Manifest'
+
         - task: KubernetesManifest@1
           displayName: "kubectl apply (${{ parameters.environmentName }})"
           inputs:
