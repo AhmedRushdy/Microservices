@@ -1,29 +1,38 @@
+# Reusable AKS deploy job template
+# File: .pipeline/templates/job-deploy-k8s.yaml
+
 parameters:
-  -name: environmentName
-   type: string
-   default: 'default'
-  -name: kubernetesServiceConnection
-   type: string
-   default: 'sc-aks-connection'     
+  - name: deploymentJobName
+    type: string
+    default: 'deploy'
+  - name: displayName
+    type: string
+    default: 'Deploy to AKS'
+  - name: environmentName
+    type: string
+    default: 'default'
+  - name: kubernetesServiceConnection
+    type: string
+    default: ''
   - name: namespace
     type: string
-    default: 'default'                       
+    default: 'default'
   - name: manifestPath
     type: string
-    default: './k8s/'
+    default: 'k8s'
   - name: imageRepository
     type: string
-    default: 'acrtaskpwc'
+    default: ''            # e.g. acrname.azurecr.io/user-product-svc
   - name: imageTag
     type: string
     default: 'latest'
   - name: containerName
-    type: string 
-    default: ''                
+    type: string
+    default: ''            # must match containers[].name in Deployment
 
 jobs:
-- deployment: Deploy
-  displayName: 'Deploy to AKS'
+- deployment: ${{ parameters.deploymentJobName }}
+  displayName: ${{ parameters.displayName }}
   environment: ${{ parameters.environmentName }}
   strategy:
     runOnce:
@@ -31,9 +40,6 @@ jobs:
         steps:
         - checkout: self
 
-        # - template: fetch-metadata-cd.yaml
-
-        # Apply manifests and set the image explicitly for the target container
         - task: KubernetesManifest@1
           displayName: "kubectl apply (${{ parameters.environmentName }})"
           inputs:
@@ -43,9 +49,9 @@ jobs:
             manifests: |
               ${{ parameters.manifestPath }}/*.yaml
             containers: |
-              ${{ parameters.containerName }}=${{ parameters.imageRepository }}:'$(resources.pipeline.ci.runID)'
+              ${{ parameters.containerName }}=${{ parameters.imageRepository }}:${{ parameters.imageTag }}
 
-        # # Optional rollout status (fail fast if not healthy)
+        # Optional: fail fast if rollout isn't healthy
         # - task: Kubernetes@1
         #   displayName: "kubectl rollout status"
         #   inputs:
