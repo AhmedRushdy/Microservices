@@ -276,13 +276,23 @@ kubectl get pods -l app=flask-app
 - `GET /products` - Retrieve all products
 - `GET /products/{id}` - Retrieve product by ID
 
-## 🤝 Contributing
+## 🚀 Future Enhancements & Recommendations
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test locally and in CI/CD pipeline
-5. Submit a pull request
+### 📊 Custom Monitoring & Alerting
+**Planned Implementation:**
+- **Azure Application Insights** integration for application performance monitoring
+- **Custom metrics** for business logic monitoring (user registrations, product views)
+- **Real-time alerting** for critical application events
+- **Dashboard creation** for operational visibility
+- **Log aggregation** using Azure Log Analytics
+
+
+### 🔒 Security Enhancements
+**Security Scanning Integration:**
+- **Trivy vulnerability scanning** in CI/CD pipeline
+- **Container image security** analysis
+- **Dependency vulnerability** checks
+- **Infrastructure security** scanning
 
 ## 📄 License
 
