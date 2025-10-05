@@ -1,0 +1,64 @@
+parameters:
+  - name: tfDir
+    type: string
+    default: 'terraform'
+  - name: planOut
+    type: string
+    default: 'tfplan.bin'
+  - name: azureRmServiceConnection
+    type: string
+    default: 'sc-aks-terraform'
+  - name: backend
+    type: object
+    default:
+      rg: 'pwc-task'
+      sa: 'terraformstate1759533356'
+      container: 'terraform-state'
+      key: 'terraform.tfstate'
+
+jobs:
+- job: TerraformPlan
+  displayName: 'Terraform Plan'
+  steps:
+  - task: TerraformInstaller@0
+    displayName: 'Install Terraform'
+    inputs:
+      terraformVersion: 'latest'
+
+  # Use AzureCLI to run Terraform with automatic SP authentication
+  - task: AzureCLI@2
+    displayName: 'Terraform Init, Validate & Plan'
+    inputs:
+      azureSubscription: '${{ parameters.azureRmServiceConnection }}'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      workingDirectory: '${{ parameters.tfDir }}'
+      addSpnToEnvironment: true  # This adds ARM_* environment variables
+      inlineScript: |
+      
+        export ARM_CLIENT_ID=$servicePrincipalId
+        export ARM_CLIENT_SECRET=$servicePrincipalKey
+        export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+        export ARM_TENANT_ID=$tenantId
+        
+        echo "Initializing Terraform..."
+        terraform init \
+          -backend-config="resource_group_name=${{ parameters.backend.rg }}" \
+          -backend-config="storage_account_name=${{ parameters.backend.sa }}" \
+          -backend-config="container_name=${{ parameters.backend.container }}" \
+          -backend-config="key=${{ parameters.backend.key }}"
+        
+        echo "Validating Terraform configuration..."
+        terraform validate
+        
+        echo "Creating Terraform plan..."
+        terraform plan -out=${{ parameters.planOut }}
+        
+        echo "Terraform plan completed successfully"
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Terraform Plan'
+    inputs:
+      targetPath: '${{ parameters.tfDir }}/${{ parameters.planOut }}'
+      artifact: 'terraform-plan'
+      publishLocation: 'pipeline'

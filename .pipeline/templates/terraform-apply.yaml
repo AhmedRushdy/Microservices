@@ -1,0 +1,66 @@
+parameters:
+  - name: tfDir
+    type: string
+    default: 'terraform'
+  - name: planOut
+    type: string
+    default: 'tfplan.bin'
+  - name: planPath
+    type: string
+    default: '$(Pipeline.Workspace)/tfplan'
+  - name: azureRmServiceConnection
+    type: string
+    default: 'sc-aks-terraform'
+  - name: backend
+    type: object
+    default:
+      rg: 'pwc-task'
+      sa: 'terraformstate1759533356'
+      container: 'terraform-state'
+      key: 'terraform.tfstate'
+
+steps:
+
+  # Copy plan file to terraform directory
+  - task: Bash@3
+    displayName: 'Copy Plan File'
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo "Copying plan file..."
+        cp "${{ parameters.planPath }}/${{ parameters.planOut }}" "${{ parameters.tfDir }}/${{ parameters.planOut }}"
+        ls -lh "${{ parameters.tfDir }}/${{ parameters.planOut }}"
+
+  # Use AzureCLI to run Terraform with automatic SP authentication
+  - task: AzureCLI@2
+    displayName: 'Terraform Init & Apply'
+    inputs:
+      azureSubscription: '${{ parameters.azureRmServiceConnection }}'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      workingDirectory: '${{ parameters.tfDir }}'
+      addSpnToEnvironment: true  # Adds SP credentials as ARM_* env vars
+      inlineScript: |
+        # Set up Service Principal environment variables
+        export ARM_CLIENT_ID=$servicePrincipalId
+        export ARM_CLIENT_SECRET=$servicePrincipalKey
+        export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+        export ARM_TENANT_ID=$tenantId
+        
+        echo "Initializing Terraform..."
+        terraform init \
+          -backend-config="resource_group_name=${{ parameters.backend.rg }}" \
+          -backend-config="storage_account_name=${{ parameters.backend.sa }}" \
+          -backend-config="container_name=${{ parameters.backend.container }}" \
+          -backend-config="key=${{ parameters.backend.key }}"
+        
+        echo "Showing plan to be applied..."
+        terraform show ${{ parameters.planOut }}
+        
+        echo "Applying Terraform plan..."
+        terraform apply -auto-approve ${{ parameters.planOut }}
+        
+        echo "Terraform apply completed successfully"
+        
+        echo "Current state:"
+        terraform show
