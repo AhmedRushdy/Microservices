@@ -31,19 +31,14 @@ stages:
     - template: step-resolve-tag.yaml
 
     - bash: |
-        set -euo pipefail
+        set -e
         echo "Logging in to Azure with VM managed identity…"
         az login --identity 1>/dev/null
 
-        echo "ACR docker login…"
-        echo "Using registry: ${{ parameters.acrName }}"
-        # Prefer standard login (talks to Docker). Falls back to token if needed.
-        if ! az acr login -n ${{ parameters.acrName }} ; then
-          echo "Falling back to token login…"
-          LOGIN_SERVER=$(az acr show -n ${{ parameters.acrName }} --query loginServer -o tsv)
-          TOKEN=$(az acr login -n ${{ parameters.acrName }} --expose-token --query accessToken -o tsv)
-          echo "$TOKEN" | docker login "$LOGIN_SERVER" -u 00000000-0000-0000-0000-000000000000 --password-stdin
-        fi
+        echo "ACR docker login to ${{ parameters.acrName }}"
+
+        az acr login -n ${{ parameters.acrName }} 
+
       displayName: "ACR login (Managed Identity)"
 
     - task: Docker@2
