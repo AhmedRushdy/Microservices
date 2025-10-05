@@ -46,8 +46,22 @@ jobs:
             namespace: '${{ parameters.namespace }}'
             manifests: |
               ${{ parameters.manifestPath }}/*.yaml
-            containers: |
-              ${{ parameters.containerName }}=${{ parameters.imageRepository }}:${{ parameters.imageTag }}
+
+stages:
+- stage: Deploy_Dev
+  displayName: Deploy
+  jobs:
+  - template: .pipeline/templates/job-deploy-k8s.yaml
+    parameters:
+      deploymentJobName: 'dev'
+      displayName: 'Deploy to default Environment'
+      environmentName: 'default'
+      kubernetesServiceConnection: $(K8S_SC)
+      namespace: '$(NS)'
+      manifestPath: $(K8S_MANIFEST_PATH)
+      imageRepository: '$(ACR_NAME).azurecr.io/$(IMAGE_NAME)'
+      imageTag: $(resources.pipeline.ci.runID)     # ← uses CI run ID (e.g., 26)
+      containerName: $(K8S_CONTAINER_NAME)
 
         # Optional: fail fast if rollout isn't healthy
         # - task: Kubernetes@1
