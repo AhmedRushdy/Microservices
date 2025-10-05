@@ -11,6 +11,7 @@ variables:
   DOCKER_SC: 'sc-acr-docker'          
   DOCKERFILE_PATH: 'Dockerfile'
   BUILD_CONTEXT: '.'
+  REGISTRY_NAME: 'acrtaskpwc.azurecr.io'
 
 stages:
 - template: .pipeline/templates/stage-build-and-push.yaml
@@ -20,6 +21,7 @@ stages:
     imageName: $(IMAGE_NAME)
     dockerfilePath: $(DOCKERFILE_PATH)
     buildContext: $(BUILD_CONTEXT)
+    REGISTRY_NAME: $(REGISTRY_NAME)
 
 
 

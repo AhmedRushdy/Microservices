@@ -4,6 +4,7 @@ parameters:
   imageName: ''                 # required (e.g., python-microservice)
   dockerfilePath: ''            # required
   buildContext: '.'             # optional
+  registryName: ''
 
 stages:
 - stage: BuildAndPush
@@ -17,12 +18,15 @@ stages:
 
     - template: step-resolve-tag.yaml
 
-    - task: Docker@2
-      displayName: Login to ACR
-      inputs:
-        command: 'login'
-        containerRegistry: 'acrtaskpwc.azurecr.io'
+    - bash: |
+        set -e
+        echo "Logging in to Azure with VM managed identity…"
+        az login --identity 1>/dev/null
 
+        echo "ACR docker login…"
+        # Approach 1: direct docker login via ACR (needs docker daemon)
+        # This will perform a 'docker login' for you if Docker is available
+        az acr login -n ${{ parameters.registeryName }}
     - task: Docker@2
       displayName: Build & Push (immutable + env tag)
       inputs:
