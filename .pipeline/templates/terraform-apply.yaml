@@ -20,6 +20,11 @@ parameters:
       key: 'terraform.tfstate'
 
 steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download Terraform Plan'
+    inputs:
+        artifact: 'terraform-plan'
+        path: '$(Pipeline.Workspace)/tfplan'
 
   # Copy plan file to terraform directory
   - task: Bash@3

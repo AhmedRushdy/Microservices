@@ -38,15 +38,6 @@ stages:
   condition: succeeded()
   jobs:
 
-      - checkout: self
-        displayName: 'Checkout Repository'
-
-      - task: DownloadPipelineArtifact@2
-        displayName: 'Download Terraform Plan'
-        inputs:
-          artifact: 'terraform-plan'
-          path: '$(Pipeline.Workspace)/tfplan'
-
       - template: .pipeline/templates/terraform-apply.yaml
         parameters:
           tfDir: 'terraform'
