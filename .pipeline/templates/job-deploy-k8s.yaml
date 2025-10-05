@@ -31,7 +31,7 @@ jobs:
         steps:
         - checkout: self
 
-        - template: fetch-metadata-cd.yaml
+        # - template: fetch-metadata-cd.yaml
 
         # Apply manifests and set the image explicitly for the target container
         - task: KubernetesManifest@1
