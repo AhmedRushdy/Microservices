@@ -14,9 +14,6 @@ parameters:
   - name: buildContext
     type: string
     # default: '.'
-  - name: registryName
-    type: string
-    # default: 'acrtaskpwc.azurecr.io'     # login server (OK to keep for display)
 
 stages:
 - stage: BuildAndPush
