@@ -1,11 +1,6 @@
 # CI: Build & push Docker image to ACR via service connection
 trigger:
-  branches:
-    include: main
-
-pr:
-  branches:
-    include: main
+     - main
 
 pool:
   vmImage: 'ubuntu-latest'
