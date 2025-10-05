@@ -1,20 +1,22 @@
 parameters:
   - name: dockerServiceConnection
-  type: string
-  default: 'sc-acr-docker'
-  
+    type: string
+    default: 'sc-acr-docker'
   - name: acrName
-  type: string
-  default: 'acrtaskpwc'
+    type: string
+    default: 'acrtaskpwc'                # <-- registry NAME only (no domain)
   - name: imageName
-  type: string
-  default: 'acrtaskpwc.azurecr.io/myflaskapp'
+    type: string
+    default: 'acrtaskpwc.azurecr.io/myflaskapp'  # full path is fine here
   - name: dockerfilePath
-  type: string
-  default: 'Dockerfile'
+    type: string
+    default: 'Dockerfile'
   - name: buildContext
-  type: string
-  default: '.'
+    type: string
+    default: '.'
+  - name: registryName
+    type: string
+    default: 'acrtaskpwc.azurecr.io'     # login server (OK to keep for display)
 
 stages:
 - stage: BuildAndPush
@@ -29,37 +31,28 @@ stages:
     - template: step-resolve-tag.yaml
 
     - bash: |
-        set -e
+        set -euo pipefail
         echo "Logging in to Azure with VM managed identity…"
         az login --identity 1>/dev/null
 
         echo "ACR docker login…"
-        echo " acrtaskpwc"
-        az acr login -n acrtaskpwc
-        
+        echo "Using registry: ${{ parameters.acrName }}"
+        # Prefer standard login (talks to Docker). Falls back to token if needed.
+        if ! az acr login -n ${{ parameters.acrName }} ; then
+          echo "Falling back to token login…"
+          LOGIN_SERVER=$(az acr show -n ${{ parameters.acrName }} --query loginServer -o tsv)
+          TOKEN=$(az acr login -n ${{ parameters.acrName }} --expose-token --query accessToken -o tsv)
+          echo "$TOKEN" | docker login "$LOGIN_SERVER" -u 00000000-0000-0000-0000-000000000000 --password-stdin
+        fi
+      displayName: "ACR login (Managed Identity)"
+
     - task: Docker@2
       displayName: Build & Push (immutable + env tag)
       inputs:
-        command: 'buildAndPush'
-        repository: '${{ parameters.imageName }}'      # repo inside ACR
+        command: buildAndPush
+        repository: '${{ parameters.imageName }}'   # full name ok since we already did docker login
         dockerfile: '${{ parameters.dockerfilePath }}'
         buildContext: '${{ parameters.buildContext }}'
-        # containerRegistry: '${{ parameters.dockerServiceConnection }}'
-        tags: latest
-
-    # - bash: |
-    #     mkdir -p out
-    #     cat > out/image-metadata.json <<EOF
-    #     {
-    #       "acrLoginServer": "${{ parameters.acrName }}.azurecr.io",
-    #       "imageName": "${{ parameters.imageName }}",
-    #       "buildTag": "$(Build.SourceBranchName)-$(Build.BuildId)",
-    #       "envTag": "$(envTag)"
-    #     }
-    #     EOF
-    #     cat out/image-metadata.json
-    #   displayName: "Write & show image metadata"
-
-    # - publish: out
-    #   artifact: image-metadata
-    #   displayName: "Publish image metadata artifact"
+        # containerRegistry: '${{ parameters.dockerServiceConnection }}'  # not needed with MI login
+        tags: |
+          latest
