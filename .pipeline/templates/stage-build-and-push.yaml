@@ -1,10 +1,23 @@
 parameters:
-  dockerServiceConnection: '' 
-  acrName: ''                   # required (e.g., acrstronggnat)
-  imageName: ''                 # required (e.g., python-microservice)
-  dockerfilePath: ''            # required
-  buildContext: '.'             # optional
-  registryName: ''
+  - name: dockerServiceConnection
+  type: string
+  default: 'sc-acr-docker'
+  
+  - name: acrName
+  type: string
+  default: 'acrtaskpwc'
+  - name: imageName
+  type: string
+  default: 'acrtaskpwc.azurecr.io/myflaskapp'
+  - name: dockerfilePath
+  type: string
+  default: 'Dockerfile'
+  - name: buildContext
+  type: string
+  default: '.'
+  - name: registryName
+    type: string
+    default: 'acrtaskpwc.azurecr.io'
 
 stages:
 - stage: BuildAndPush
