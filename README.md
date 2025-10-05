@@ -126,50 +126,20 @@ Comprehensive CI/CD pipeline implemented using Azure DevOps with self-hosted age
 - **Infrastructure as Code** validation and deployment
 - **Secure service connections** for ACR and AKS access
 
-### 7. 📊 Monitoring Implementation
-Monitoring is implemented using Azure Application Insights:
+### 7. 🔐 Managed Identity Implementation
+The project implements Azure Managed Identity for secure authentication across all Azure services:
 
-**Monitoring Approach:**
-- **Azure Application Insights** integration
-- **Application Performance Monitoring (APM)**
-- **Custom metrics and logging**
-- **Real-time monitoring dashboard**
+**Managed Identity Features:**
+- **System-assigned Managed Identity** for AKS cluster
+- **ACR Integration** with managed identity for secure image pulls
+- **Pipeline Authentication** using managed identity instead of service principals
+- **Self-hosted Agent Pool** configured with managed identity permissions
 
-**Monitoring Capabilities:**
-- Application performance metrics
-- Request/response tracking
-- Error monitoring and alerting
-- Dependency tracking
-- Custom telemetry
-
-**Enabling Azure Application Insights:**
-
-1. **Add Application Insights SDK to requirements.txt:**
-```txt
-opencensus-ext-azure==1.1.13
-opencensus-ext-flask==0.7.0
-```
-
-2. **Configure Application Insights in your Flask app:**
-```python
-from opencensus.ext.azure import metrics_exporter
-from opencensus.ext.flask.flask_middleware import FlaskMiddleware
-
-# Initialize Application Insights
-exporter = metrics_exporter.new_metrics_exporter(
-    connection_string="YOUR_CONNECTION_STRING"
-)
-
-# Add middleware to Flask app
-FlaskMiddleware(app, exporter=exporter)
-```
-
-3. **Set up monitoring in Kubernetes:**
-```yaml
-env:
-  - name: APPLICATIONINSIGHTS_CONNECTION_STRING
-    value: "YOUR_CONNECTION_STRING"
-```
+**Security Benefits:**
+- No credential storage or management required
+- Automatic credential rotation
+- Enhanced security for CI/CD pipelines
+- Secure access to Azure Container Registry
 
 ## 🚀 Quick Start
 
@@ -195,12 +165,13 @@ python run.py
 
 ### Production Deployment
 ```bash
-# 1. Provision infrastructure
+# 1. Provision infrastructure with managed identity
 cd terraform
 terraform init
+terraform plan
 terraform apply
 
-# 2. Build and push Docker image
+# 2. Build and push Docker image to ACR
 docker build -t acrtaskpwc.azurecr.io/user-product-svc:latest .
 docker push acrtaskpwc.azurecr.io/user-product-svc:latest
 
@@ -243,7 +214,6 @@ Microservices/
 ## 🔧 Configuration
 
 ### Environment Variables
-- `APPLICATIONINSIGHTS_CONNECTION_STRING`: Azure Application Insights connection string
 - `FLASK_ENV`: Flask environment (development/production)
 
 ### Azure Configuration
@@ -254,19 +224,18 @@ Microservices/
 - Self-hosted Agent Pool: `pwc-task`
 - Managed Identity: Configured for secure authentication
 
-## 📈 Monitoring Dashboard
+## 📈 Infrastructure Monitoring
 
-Access your Azure Application Insights dashboard to monitor:
-- **Request rates and response times**
-- **Error rates and exceptions**
-- **Dependency performance**
-- **Custom metrics and logs**
-- **Real-time application map**
+The infrastructure is monitored through Azure native services:
+- **AKS Cluster Health** via Azure Portal
+- **Container Registry** access logs
+- **Load Balancer** metrics and health probes
+- **Resource Group** resource monitoring
 
 ## 🛠️ Troubleshooting
 
 ### Common Issues
-1. **Image pull errors**: Ensure ACR credentials are configured
+1. **Image pull errors**: Ensure ACR managed identity permissions are configured
 2. **Service not accessible**: Check LoadBalancer external IP
 3. **Pod startup failures**: Verify resource limits and image tags
 4. **Pipeline failures**: Check service connections and managed identity permissions
@@ -289,13 +258,13 @@ kubectl get pods -l app=flask-app
 
 ## 🔒 Security Considerations
 
-- Non-root user in Docker container
-- Resource limits in Kubernetes
-- RBAC configuration for AKS
-- Secure image registry access via managed identity
-- Self-hosted agents for enhanced security control
-- Managed identity authentication eliminates credential storage
-- Network policies (can be added)
+- **Non-root user** in Docker container
+- **Resource limits** in Kubernetes deployment
+- **System-assigned managed identity** for AKS cluster
+- **ACR integration** with managed identity for secure image pulls
+- **Self-hosted agents** for enhanced security control
+- **Managed identity authentication** eliminates credential storage
+- **RBAC configuration** for AKS cluster access
 
 ## 📝 API Documentation
 
@@ -321,4 +290,4 @@ This project is part of a PWC task demonstration and is for educational purposes
 
 ---
 
-**Note**: This implementation demonstrates a complete microservices architecture with modern DevOps practices, cloud-native deployment, and comprehensive monitoring using Azure services.
+**Note**: This implementation demonstrates a complete microservices architecture with modern DevOps practices, cloud-native deployment, and secure authentication using Azure Managed Identity.
