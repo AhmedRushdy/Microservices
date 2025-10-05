@@ -20,11 +20,10 @@ jobs:
 - job: TerraformPlan
   displayName: 'Terraform Plan'
   steps:
-  - task: TerraformInstaller@0
+  - task: TerraformInstaller@1
     displayName: 'Install Terraform'
     inputs:
       terraformVersion: 'latest'
-
   # Use AzureCLI to run Terraform with automatic SP authentication
   - task: AzureCLI@2
     displayName: 'Terraform Init, Validate & Plan'
