@@ -48,3 +48,6 @@ stages:
         tags: |
           latest
           $(Build.BuildId)
+
+    - template: push-metadata-ci.yaml
+
