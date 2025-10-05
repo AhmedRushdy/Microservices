@@ -12,14 +12,10 @@ resource "random_pet" "azurerm_kubernetes_cluster_dns_prefix" {
   prefix = "dns"
 }
 
-resource "random_pet" "acr_name" {
-  prefix    = "acr"
-  separator = ""
-}
 
 # Create Azure Container Registry
 resource "azurerm_container_registry" "acr" {
-  name                = random_pet.acr_name.id
+  name                = var.acr_name
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "Standard"

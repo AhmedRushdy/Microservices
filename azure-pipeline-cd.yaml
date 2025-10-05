@@ -1,0 +1,36 @@
+
+resources:
+  pipelines:
+    - pipeline: ci
+      source: ci
+      trigger:
+        branches:
+          include: main
+
+pool:
+  name: pwc-task
+
+
+variables:
+  ACR_NAME: 'acrtaskpwc'
+  IMAGE_NAME: 'user-product-svc'
+  K8S_SC: 'sc-aks-connection'
+  NS: 'default'
+  K8S_MANIFEST_PATH: 'k8s'
+  K8S_CONTAINER_NAME: 'flask-app'   
+
+stages:
+- stage: Deploy_Dev
+  displayName: Deploy
+  jobs:
+  - template: .pipelines/templates/job-deploy-k8s.yml
+    parameters:
+      deploymentJobName: "dev"
+      displayName: "Deploy to default Environment"
+      environmentName: "default"                           # Azure DevOps Environment
+      kubernetesServiceConnection: $(K8S_SC)
+      namespace: '$(NS)'
+      manifestPath: $(K8S_MANIFEST_PATH)
+      imageRepository: '$(ACR_NAME).azurecr.io/$(IMAGE_NAME)'
+      imageTag: '$(resources.pipeline.ci.runID)' 
+      containerName: $(K8S_CONTAINER_NAME)

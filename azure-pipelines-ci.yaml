@@ -1,0 +1,25 @@
+# CI: Build & push Docker image to ACR via service connection
+trigger:
+     - main
+pool:
+  name: pwc-task  
+
+# Fallback defaults 
+variables:
+  ACR_NAME: 'acrtaskpwc'          
+  IMAGE_NAME: 'acrtaskpwc.azurecr.io/user-product-svc'   
+  DOCKER_SC: 'sc-acr-docker'         
+  DOCKERFILE_PATH: 'Dockerfile'
+  BUILD_CONTEXT: '.'
+
+stages:
+- template: .pipeline/templates/stage-build-and-push.yaml
+  parameters:
+    dockerServiceConnection: $(DOCKER_SC)
+    acrName: $(ACR_NAME)
+    imageName: $(IMAGE_NAME)
+    dockerfilePath: $(DOCKERFILE_PATH)
+    buildContext: $(BUILD_CONTEXT)
+
+
+

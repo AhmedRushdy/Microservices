@@ -1,0 +1,56 @@
+parameters:
+  -name: environmentName
+   type: string
+   default: 'default'
+  -name: kubernetesServiceConnection
+   type: string
+   default: 'sc-aks-connection'     
+  - name: namespace
+    type: string
+    default: 'default'                       
+  - name: manifestPath
+    type: string
+    default: './k8s/'
+  - name: imageRepository
+    type: string
+    default: 'acrtaskpwc'
+  - name: imageTag
+    type: string
+    default: 'latest'
+  - name: containerName
+    type: string 
+    default: ''                
+
+jobs:
+- deployment: Deploy
+  displayName: 'Deploy to AKS'
+  environment: ${{ parameters.environmentName }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+
+        - template: fetch-metadata-cd.yaml
+
+        # Apply manifests and set the image explicitly for the target container
+        - task: KubernetesManifest@1
+          displayName: "kubectl apply (${{ parameters.environmentName }})"
+          inputs:
+            action: 'deploy'
+            kubernetesServiceConnection: '${{ parameters.kubernetesServiceConnection }}'
+            namespace: '${{ parameters.namespace }}'
+            manifests: |
+              ${{ parameters.manifestPath }}/*.yaml
+            containers: |
+              ${{ parameters.containerName }}=${{ parameters.imageRepository }}:'$(resources.pipeline.ci.runID)'
+
+        # # Optional rollout status (fail fast if not healthy)
+        # - task: Kubernetes@1
+        #   displayName: "kubectl rollout status"
+        #   inputs:
+        #     connectionType: 'Kubernetes Service Connection'
+        #     kubernetesServiceEndpoint: '${{ parameters.kubernetesServiceConnection }}'
+        #     namespace: '${{ parameters.namespace }}'
+        #     command: 'rollout'
+        #     arguments: 'status deployment/${{ parameters.containerName }} --timeout=120s'

@@ -20,7 +20,7 @@ spec:
       #   - name: regcred
       containers:
         - name: flask-app
-          image: IMAGE_HERE
+          image: user-product-svc
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000

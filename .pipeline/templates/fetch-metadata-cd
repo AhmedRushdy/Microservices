@@ -1,0 +1,54 @@
+parameters:
+  pipelineResource: 'ci'                # pipeline resource alias
+  artifactName: 'image-metadata'        # artifact published by CI
+  fileName: 'image-metadata.json'       # JSON file inside the artifact
+  outputVariableName: 'IMAGE_TAG'       # name of the output variable to set
+  preferField: 'buildTag'               # 'buildTag' or 'envTag'
+  stepName: 'readmeta'                  # step name used when referencing outputs
+  failIfMissing: true                   # fail if no tag found
+
+steps:
+- download: ${{ parameters.pipelineResource }}
+  artifact: ${{ parameters.artifactName }}
+  displayName: "Download ${{ parameters.artifactName }} from ${{ parameters.pipelineResource }}"
+
+- bash: |
+    set -euo pipefail
+    FILE="$(Pipeline.Workspace)/${{ parameters.pipelineResource }}/${{ parameters.artifactName }}/${{ parameters.fileName }}"
+    echo "Reading $FILE"
+    if [ ! -f "$FILE" ]; then
+      echo "File not found: $FILE"
+      exit 1
+    fi
+
+    # helper to extract tag (jq preferred; fallback to python3)
+    get_tag() {
+      if command -v jq >/dev/null 2>&1; then
+        jq -r '
+          .${{ parameters.preferField }} // (
+            if "${{ parameters.preferField }}" == "buildTag" then .envTag else .buildTag end
+          ) // empty
+        ' "$FILE"
+      else
+        python3 - "$FILE" <<'PY'
+          import json,sys,os
+          f=sys.argv[1]
+          d=json.load(open(f))
+          prefer=os.environ.get("PREFER","${{ parameters.preferField }}")
+          tag=d.get(prefer) or d.get("envTag" if prefer=="buildTag" else "buildTag") or ""
+          print(tag)
+          PY
+                fi
+              }
+
+    TAG="$(PREFER='${{ parameters.preferField }}' get_tag || true)"
+    if [ -z "${TAG:-}" ] || [ "$TAG" = "null" ]; then
+      echo "No tag found in $FILE"
+      ${{ if eq(parameters.failIfMissing, true) }}: { echo "##vso[task.logissue type=error]No tag found"; exit 1; }
+      ${{ if ne(parameters.failIfMissing, true) }}: { TAG=""; }
+    fi
+
+    echo "Resolved tag: $TAG"
+    echo "##vso[task.setvariable variable=${{ parameters.outputVariableName }};isOutput=true]$TAG"
+  name: ${{ parameters.stepName }}
+  displayName: "Read tag from ${{ parameters.fileName }} (bash)"

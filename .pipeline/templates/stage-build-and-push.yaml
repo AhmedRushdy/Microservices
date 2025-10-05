@@ -1,0 +1,53 @@
+parameters:
+  - name: dockerServiceConnection
+    type: string
+    # default: 'sc-acr-docker'
+  - name: acrName
+    type: string
+    # default: 'acrtaskpwc'                
+  - name: imageName
+    type: string
+    # default: 'acrtaskpwc.azurecr.io/myflaskapp' 
+  - name: dockerfilePath
+    type: string
+    # default: 'Dockerfile'
+  - name: buildContext
+    type: string
+    # default: '.'
+
+stages:
+- stage: BuildAndPush
+  displayName: Build & Push Image
+  jobs:
+  - job: docker_build_push
+    displayName: Docker build & push
+    steps:
+    - checkout: self
+      fetchDepth: 0
+
+    - template: step-resolve-tag.yaml
+
+    - bash: |
+        set -e
+        echo "Logging in to Azure with VM managed identity…"
+        az login --identity 1>/dev/null
+
+        echo "ACR docker login to ${{ parameters.acrName }}"
+
+        az acr login -n ${{ parameters.acrName }} 
+
+      displayName: "ACR login (Managed Identity)"
+
+    - task: Docker@2
+      displayName: Build & Push (immutable + env tag)
+      inputs:
+        command: buildAndPush
+        repository: '${{ parameters.imageName }}'   
+        dockerfile: '${{ parameters.dockerfilePath }}'
+        buildContext: '${{ parameters.buildContext }}'
+        tags: |
+          latest
+          $(Build.BuildId)
+
+    - template: push-metadata-ci.yaml
+
