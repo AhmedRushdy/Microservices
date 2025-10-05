@@ -6,7 +6,7 @@ resources:
       trigger: 
         branches:
           include: 
-          - main
+            - main
 trigger: none
 pool:
   name: pwc-task
