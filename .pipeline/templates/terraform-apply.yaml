@@ -27,8 +27,11 @@ jobs:
     inputs:
         artifact: 'terraform-plan'
         path: '$(Pipeline.Workspace)/tfplan'
-
-  # Copy plan file to terraform directory
+  - task: TerraformInstaller@1
+    displayName: 'Install Terraform'
+    inputs:
+        terraformVersion: 'latest'
+    # Copy plan file to terraform directory
   - task: Bash@3
     displayName: 'Copy Plan File'
     inputs:
