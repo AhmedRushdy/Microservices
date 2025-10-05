@@ -18,7 +18,7 @@ variables:
   K8S_SC: 'sc-aks-connection'
   NS: 'default'
   K8S_MANIFEST_PATH: 'k8s'
-  K8S_CONTAINER_NAME: 'flask-app'
+  K8S_CONTAINER_NAME: 'acrtaskpwc.azurecr.io/user-product-svc'
 
 stages:
 - stage: Deploy
@@ -33,5 +33,5 @@ stages:
       namespace: '$(NS)'
       manifestPath: $(K8S_MANIFEST_PATH)
       imageRepository: '$(ACR_NAME).azurecr.io/$(IMAGE_NAME)'
-      imageTag: $(resources.pipeline.ci.runID)     
+      imageTag: $(resources.pipeline.ci.runID)     # ← uses CI run ID (e.g., 26)
       containerName: $(K8S_CONTAINER_NAME)
