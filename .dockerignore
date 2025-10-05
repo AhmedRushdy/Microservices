@@ -8,4 +8,5 @@ venv/
 .git
 .gitignore
 Dockerfile
-docker-compose*.yml
+terraform/
+k8s/
