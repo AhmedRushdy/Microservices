@@ -24,8 +24,8 @@ stages:
         az login --identity 1>/dev/null
 
         echo "ACR docker login…"
-        echo ${{ parameters.registeryName }}
-        az acr login -n ${{ parameters.registeryName }}
+        echo ${{ parameters.registryName }}
+        az acr login -n ${{ parameters.registryName }}
         
     - task: Docker@2
       displayName: Build & Push (immutable + env tag)
