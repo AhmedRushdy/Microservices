@@ -20,7 +20,7 @@ stages:
 - stage: terraform_validate_plan
   displayName: 'Terraform Validate & Plan'
   jobs:
-  - template: .pipeline/templates/terraform-plan-template.yaml
+  - template: .pipeline/templates/terraform-plan.yaml
     parameters:
       tfDir: 'terraform'
       planOut: 'tfplan.bin'
@@ -39,7 +39,6 @@ stages:
   jobs:
     - deployment: tf_apply
       displayName: 'Apply Terraform Changes'
-      environment: 'production'  # Creates approval gate in Azure DevOps
       pool:
         name: pwc-task
       strategy:
@@ -55,7 +54,7 @@ stages:
                   artifact: 'terraform-plan'
                   path: '$(Pipeline.Workspace)/tfplan'
 
-              - template: .pipeline/templates/terraform-apply.yml
+              - template: .pipeline/templates/terraform-apply.yaml
                 parameters:
                   tfDir: 'terraform'
                   planOut: 'tfplan.bin'
