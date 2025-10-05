@@ -7,7 +7,7 @@ pool:
 # Fallback defaults 
 variables:
   ACR_NAME: 'acrtaskpwc'          
-  IMAGE_NAME: 'flask-microservice'   
+  IMAGE_NAME: 'acrtaskpwc.azurecr.io.myflaskapp:dev'   
   DOCKER_SC: 'sc-acr-docker'          
   DOCKERFILE_PATH: 'Dockerfile'
   BUILD_CONTEXT: '.'

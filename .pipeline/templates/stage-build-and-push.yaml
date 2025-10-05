@@ -30,7 +30,7 @@ stages:
         repository: '${{ parameters.imageName }}'      # repo inside ACR
         dockerfile: '${{ parameters.dockerfilePath }}'
         buildContext: '${{ parameters.buildContext }}'
-        containerRegistry: '${{ parameters.dockerServiceConnection }}'
+        # containerRegistry: '${{ parameters.dockerServiceConnection }}'
         tags: |
           $(Build.SourceBranchName)-$(Build.BuildId)
           $(envTag)
