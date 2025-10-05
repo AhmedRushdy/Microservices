@@ -33,7 +33,7 @@ stages:
         # containerRegistry: '${{ parameters.dockerServiceConnection }}'
         tags: |
           $(Build.BuildId)
-          $(envTag)
+          latest
 
     # - bash: |
     #     mkdir -p out
