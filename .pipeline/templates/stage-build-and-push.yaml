@@ -47,3 +47,4 @@ stages:
         buildContext: '${{ parameters.buildContext }}'
         tags: |
           latest
+           $(Build.SourceBranchName)-$(Build.BuildId)
