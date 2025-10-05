@@ -37,31 +37,24 @@ stages:
   dependsOn: terraform_validate_plan
   condition: succeeded()
   jobs:
-    - deployment: tf_apply
-      displayName: 'Apply Terraform Changes'
-      pool:
-        name: pwc-task
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - checkout: self
-                displayName: 'Checkout Repository'
+    steps:
+      - checkout: self
+        displayName: 'Checkout Repository'
 
-              - task: DownloadPipelineArtifact@2
-                displayName: 'Download Terraform Plan'
-                inputs:
-                  artifact: 'terraform-plan'
-                  path: '$(Pipeline.Workspace)/tfplan'
+      - task: DownloadPipelineArtifact@2
+        displayName: 'Download Terraform Plan'
+        inputs:
+          artifact: 'terraform-plan'
+          path: '$(Pipeline.Workspace)/tfplan'
 
-              - template: .pipeline/templates/terraform-apply.yaml
-                parameters:
-                  tfDir: 'terraform'
-                  planOut: 'tfplan.bin'
-                  planPath: '$(Pipeline.Workspace)/tfplan'
-                  azureRmServiceConnection: $(AZURE_RM_SVC_CONN)
-                  backend:
-                    rg: $(TF_STATE_RG)
-                    sa: $(TF_STATE_SA)
-                    container: $(TF_STATE_CONTAINER)
-                    key: $(TF_STATE_KEY)
+      - template: .pipeline/templates/terraform-apply.yaml
+        parameters:
+          tfDir: 'terraform'
+          planOut: 'tfplan.bin'
+          planPath: '$(Pipeline.Workspace)/tfplan'
+          azureRmServiceConnection: $(AZURE_RM_SVC_CONN)
+          backend:
+            rg: $(TF_STATE_RG)
+            sa: $(TF_STATE_SA)
+            container: $(TF_STATE_CONTAINER)
+            key: $(TF_STATE_KEY)
