@@ -7,8 +7,8 @@ pool:
 # Fallback defaults 
 variables:
   ACR_NAME: 'acrtaskpwc'          
-  IMAGE_NAME: 'acrtaskpwc.azurecr.io/myflaskapp'   
-  DOCKER_SC: 'sc-acr-docker'          
+  IMAGE_NAME: 'acrtaskpwc.azurecr.io/user-product-svc'   
+  DOCKER_SC: 'sc-acr-docker'         
   DOCKERFILE_PATH: 'Dockerfile'
   BUILD_CONTEXT: '.'
 

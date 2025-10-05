@@ -1,22 +1,22 @@
 parameters:
   - name: dockerServiceConnection
     type: string
-    default: 'sc-acr-docker'
+    # default: 'sc-acr-docker'
   - name: acrName
     type: string
-    default: 'acrtaskpwc'                # <-- registry NAME only (no domain)
+    # default: 'acrtaskpwc'                
   - name: imageName
     type: string
-    default: 'acrtaskpwc.azurecr.io/myflaskapp'  # full path is fine here
+    # default: 'acrtaskpwc.azurecr.io/myflaskapp' 
   - name: dockerfilePath
     type: string
-    default: 'Dockerfile'
+    # default: 'Dockerfile'
   - name: buildContext
     type: string
-    default: '.'
+    # default: '.'
   - name: registryName
     type: string
-    default: 'acrtaskpwc.azurecr.io'     # login server (OK to keep for display)
+    # default: 'acrtaskpwc.azurecr.io'     # login server (OK to keep for display)
 
 stages:
 - stage: BuildAndPush
@@ -45,9 +45,8 @@ stages:
       displayName: Build & Push (immutable + env tag)
       inputs:
         command: buildAndPush
-        repository: '${{ parameters.imageName }}'   # full name ok since we already did docker login
+        repository: '${{ parameters.imageName }}'   
         dockerfile: '${{ parameters.dockerfilePath }}'
         buildContext: '${{ parameters.buildContext }}'
-        # containerRegistry: '${{ parameters.dockerServiceConnection }}'  # not needed with MI login
         tags: |
           latest
