@@ -15,9 +15,6 @@ parameters:
   - name: buildContext
   type: string
   default: '.'
-  - name: registryName
-    type: string
-    default: 'acrtaskpwc'
 
 stages:
 - stage: BuildAndPush
@@ -37,8 +34,8 @@ stages:
         az login --identity 1>/dev/null
 
         echo "ACR docker login…"
-        echo ${{ parameters.registryName }}
-        az acr login -n ${{ parameters.registryName }}
+        echo ${{ parameters.acrName }}
+        az acr login -n ${{ parameters.acrName }}
         
     - task: Docker@2
       displayName: Build & Push (immutable + env tag)
