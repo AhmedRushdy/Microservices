@@ -1,0 +1,56 @@
+parameters:
+  dockerServiceConnection: '' 
+  acrName: ''                   # required (e.g., acrstronggnat)
+  imageName: ''                 # required (e.g., python-microservice)
+  dockerfilePath: ''            # required
+  buildContext: '.'             # optional
+
+steps:
+
+
+stages:
+- stage: BuildAndPush
+  displayName: Build & Push Image
+  jobs:
+  - job: docker_build_push
+    displayName: Docker build & push
+    steps:
+    - checkout: self
+      fetchDepth: 0
+
+    - template: steps-resolve-envtag.yaml
+
+    - task: Docker@2
+    displayName: Login to ACR
+    inputs:
+        command: 'login'
+        containerRegistry: '${{ parameters.dockerServiceConnection }}'      parameters:
+
+    - task: Docker@2
+      displayName: Build & Push (immutable + env tag)
+      inputs:
+        command: 'buildAndPush'
+        repository: '${{ parameters.imageName }}'      # repo inside ACR
+        dockerfile: '${{ parameters.dockerfilePath }}'
+        buildContext: '${{ parameters.buildContext }}'
+        containerRegistry: '${{ parameters.dockerServiceConnection }}'
+        tags: |
+          $(Build.SourceBranchName)-$(Build.BuildId)
+          $(envTag)
+
+    # - bash: |
+    #     mkdir -p out
+    #     cat > out/image-metadata.json <<EOF
+    #     {
+    #       "acrLoginServer": "${{ parameters.acrName }}.azurecr.io",
+    #       "imageName": "${{ parameters.imageName }}",
+    #       "buildTag": "$(Build.SourceBranchName)-$(Build.BuildId)",
+    #       "envTag": "$(envTag)"
+    #     }
+    #     EOF
+    #     cat out/image-metadata.json
+    #   displayName: "Write & show image metadata"
+
+    # - publish: out
+    #   artifact: image-metadata
+    #   displayName: "Publish image metadata artifact"

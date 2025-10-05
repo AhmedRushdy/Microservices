@@ -1,0 +1,31 @@
+# CI: Build & push Docker image to ACR via service connection
+trigger:
+  branches:
+    include: main
+
+pr:
+  branches:
+    include: main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+# Fallback defaults 
+variables:
+  ACR_NAME: 'acrtaskpwc'          
+  IMAGE_NAME: 'flask-microservice'   
+  DOCKER_SC: 'sc-acr-docker'          
+  DOCKERFILE_PATH: 'Dockerfile'
+  BUILD_CONTEXT: '.'
+
+stages:
+- template: .pipelines/templates/stage-build-and-push.yml
+  parameters:
+    dockerServiceConnection: $(DOCKER_SC)
+    acrName: $(ACR_NAME)
+    imageName: $(IMAGE_NAME)
+    dockerfilePath: $(DOCKERFILE_PATH)
+    buildContext: $(BUILD_CONTEXT)
+
+
+

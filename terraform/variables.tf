@@ -34,3 +34,9 @@ variable "username" {
   description = "The admin username for the new cluster."
   default     = "azureadmin"
 }
+
+variable "acr_name" {
+  type        = string
+  description = "acr name"
+  default     = "acrtaskpwc"
+}
