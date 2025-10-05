@@ -21,7 +21,7 @@ stages:
       displayName: Login to ACR
       inputs:
         command: 'login'
-        containerRegistry: '${{ parameters.dockerServiceConnection }}'
+        containerRegistry: 'acrtaskpwc.azurecr.io'
 
     - task: Docker@2
       displayName: Build & Push (immutable + env tag)
