@@ -1,1 +1,4 @@
 build.log
+terraform/.terraform
+terraform/.terraform.lock*
+terraform/terraform.tfstate*
