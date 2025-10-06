@@ -286,6 +286,50 @@ kubectl get pods -l app=flask-app
 - **Dashboard creation** for operational visibility
 - **Log aggregation** using Azure Log Analytics
 
+### 🧰 Azure Monitoring & Application Insights (Reference Commands)
+These commands are provided for future enhancement reference (not implemented in this repo).
+
+```bash
+# Create or reference a Log Analytics workspace
+az monitor log-analytics workspace create \
+  --resource-group pwc-task \
+  --workspace-name pwc-logs \
+  --location eastus
+
+# Create Application Insights (workspace-based)
+az monitor app-insights component create \
+  --app app-insights-pwc-task \
+  --location eastus \
+  --resource-group pwc-task \
+  --workspace $(az monitor log-analytics workspace show \
+                 --resource-group pwc-task \
+                 --workspace-name pwc-logs \
+                 --query id -o tsv)
+
+# Get the Application Insights connection string
+az monitor app-insights component show \
+  --app app-insights-pwc-task \
+  --resource-group pwc-task \
+  --query connectionString -o tsv
+
+# Enable AKS monitoring (Container Insights)
+az aks enable-addons \
+  --resource-group pwc-task \
+  --name <your-aks-name> \
+  --addons monitoring \
+  --workspace-resource-id $(az monitor log-analytics workspace show \
+                              --resource-group pwc-task \
+                              --workspace-name pwc-logs \
+                              --query id -o tsv)
+
+# Verify addon status
+az aks show -g pwc-task -n <your-aks-name> \
+  --query addonProfiles.omsagent.enabled
+```
+
+Notes:
+- Replace `<your-aks-name>` and `pwc-logs` with your actual resource names.
+- Store the connection string securely (e.g., Key Vault or pipeline secret) when implemented.
 
 ### 🔒 Security Enhancements
 **Security Scanning Integration:**
