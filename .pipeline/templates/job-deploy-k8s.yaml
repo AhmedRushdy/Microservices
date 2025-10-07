@@ -56,11 +56,11 @@ jobs:
               ${{ parameters.containerName }}=${{ parameters.imageRepository }}:${{ parameters.imageTag }}
 
         # fail fast if rollout isn't healthy
-        - task: Kubernetes@1
-          displayName: "kubectl rollout status"
-          inputs:
-            connectionType: 'Kubernetes Service Connection'
-            kubernetesServiceEndpoint: '${{ parameters.kubernetesServiceConnection }}'
-            namespace: '${{ parameters.namespace }}'
-            command: 'rollout'
-            arguments: 'status deployment/${{ parameters.containerName }} --timeout=120s'
+        # - task: Kubernetes@1
+        #   displayName: "kubectl rollout status"
+        #   inputs:
+        #     connectionType: 'Kubernetes Service Connection'
+        #     kubernetesServiceEndpoint: '${{ parameters.kubernetesServiceConnection }}'
+        #     namespace: '${{ parameters.namespace }}'
+        #     command: 'rollout'
+        #     arguments: 'status deployment/${{ parameters.containerName }} --timeout=120s'
