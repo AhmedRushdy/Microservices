@@ -328,8 +328,7 @@ az aks show -g pwc-task -n <your-aks-name> \
 ```
 
 Notes:
-- Replace `<your-aks-name>` and `pwc-logs` with your actual resource names.
-- Store the connection string securely (e.g., Key Vault or pipeline secret) when implemented.
+- Store the connection string securely in Azure Key Vault when implemented.
 
 ### 🔒 Security Enhancements
 **Security Scanning Integration:**
